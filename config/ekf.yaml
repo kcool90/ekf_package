@@ -1,23 +1,45 @@
 ekf_filter_node:
-  ros__parameters:
-    frequency: 30.0
-    two_d_mode: true
-    sensor_timeout: 0.1
+  frequency: 30.0
+  sensor_timeout: 0.1
+  # If your robot is operating on a plane, enable 2D mode.
+  two_d_mode: true
+  transform_timeout: 0.0
+  print_diagnostics: true
 
-    odom_frame: "odom"
-    base_link_frame: "base_link"
-    world_frame: "odom"
+  # Frame IDs (adjust these to match your TF tree)
+  map_frame: map
+  odom_frame: odom
+  base_link_frame: base_link
+  # In 2D mode the world frame is typically the odom frame.
+  world_frame: odom
 
-    odometry0: "odom"
-    odometry0_config: [true, true, false,  
-                       false, false, true,
-                       true, true, false,
-                       false, false, true,
-                       false, false, false]
+  # Odometry (e.g., from wheel encoders or visual odom)
+  odom0: odom
+  # This config uses x, y, yaw, and their corresponding linear velocities.
+  odom0_config: [true, true, false,   # position: x, y, z (z ignored)
+                 false, false, true,   # orientation: roll, pitch, yaw (only yaw used)
+                 true, true, false,    # linear velocity: vx, vy, vz (only vx and vy used)
+                 false, false, false,  # angular velocity: vroll, vpitch, vyaw
+                 false, false, false]  # accelerations (not used)
+  odom0_differential: false
 
-    imu0: "imu/data"
-    imu0_config: [false, false, false,
-                  true, true, true,
-                  false, false, false,
-                  true, true, true,
-                  false, false, false]
+  # IMU (typically providing orientation and angular velocity)
+  imu0: imu/data
+  # This config uses the orientation (roll, pitch, yaw) and angular velocity.
+  imu0_config: [false, false, false,  # no direct position info
+                true,  true,  true,   # orientation: use roll, pitch, yaw
+                false, false, false,  # no linear velocity info
+                true,  true,  true,   # angular velocity: vroll, vpitch, vyaw
+                false, false, false]  # accelerations (can be enabled if needed)
+  imu0_differential: false
+  imu0_relative: true
+
+  # GPS (typically providing only position in x and y)
+  gps0: gps/fix
+  # This config uses x and y positions only.
+  gps0_config: [true, true, false,    # position: use x and y, ignore z
+                false, false, false,  # no orientation data
+                false, false, false,  # no velocity data
+                false, false, false,  # no angular velocity
+                false, false, false]  # no acceleration data
+  gps0_differential: false
